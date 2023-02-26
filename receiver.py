@@ -18,4 +18,25 @@ print(file_name)
 file_size = client.recv(1024).decode()
 print(file_size)
 
-file = open()
+file = open(file_name, "wb")
+
+done = False
+
+file_bytes = b""
+
+progress = tqdm.tqdm(unit="B", unit_scale=True, unit_divisor=1000, total=int(file_size))
+
+while not done:
+    data = client.recv(1024)
+    if file_bytes[-5:] == b"<END>":
+        done = True
+    else:
+        file_bytes += data
+    progress.update(1024)
+
+print(file_bytes)
+file.write(cipher.decrypt(file_bytes[:-5]))
+
+file.close()
+client.close()
+server.close()
